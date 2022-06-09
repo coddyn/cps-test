@@ -119,10 +119,10 @@ public class cpsTestGUI{
             FileWriter writer = new FileWriter(filename, true);
             writer.write(date + "\n\t- High Score: ≈" + high_score);
             if(duration == 1){
-                writer.append("\n\t- Clicks: " + numClicks + "\n\t -Time: " + duration +" second");
+                writer.append("\n\t- Clicks: " + numClicks + "\n\t -Time: " + duration +" second\n");
             }
             else{
-                writer.append("\n\t- Clicks: " + numClicks + "\n\t- Time: " + duration +" seconds");
+                writer.append("\n\t- Clicks: " + numClicks + "\n\t- Time: " + duration +" seconds\n");
             }
             writer.close();
         }
