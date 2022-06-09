@@ -116,10 +116,14 @@ public class cpsTestGUI{
         String date = time.format(myFormat);
         String filename = "gameHistory.txt";
         try{
-            FileWriter writer = new FileWriter(filename);
+            FileWriter writer = new FileWriter(filename, true);
             writer.write(date + "\n\t- High Score: ≈" + high_score);
-            writer.append("\n\t- Clicks: " + numClicks + "\n\t -Time: ≈" + duration +"s");
-            writer.append("\n");
+            if(duration == 1){
+                writer.append("\n\t- Clicks: " + numClicks + "\n\t -Game type: " + duration +" second");
+            }
+            else{
+                writer.append("\n\t- Clicks: " + numClicks + "\n\t- Game type: " + duration +" seconds");
+            }
             writer.close();
         }
         catch(IOException e){
