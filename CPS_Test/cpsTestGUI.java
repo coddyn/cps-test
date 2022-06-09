@@ -71,7 +71,7 @@ public class cpsTestGUI{
                     button.setEnabled(false);
                     cps = (double)Math.round((numClicks/second) * 100.0)/100.0;
                     if(cps > highScore){
-                        highScore = cps;
+                        highScore = (double)Math.round(cps * 100.0)/100.0;
                     }
                     highestScore.setText("Highest score this session: " + highScore + " Clicks/s");
                 }
@@ -106,7 +106,7 @@ public class cpsTestGUI{
        clicksPerSec.setPreferredSize(new Dimension(200, 50));
        highestScore.setPreferredSize(new Dimension(300, 50));
        saveScore.setPreferredSize(new Dimension(150, 100));
-       panel.setPreferredSize(new Dimension(800, 800));
+       panel.setPreferredSize(new Dimension(800, 800 ));
     }
 
     public void saveFile(){
@@ -130,7 +130,6 @@ public class cpsTestGUI{
             e.printStackTrace();
         }
     }
-
 
     public void initializeButtons(){
        stopwatch();
