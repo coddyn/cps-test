@@ -105,7 +105,7 @@ public class cpsTestGUI{
        time.setPreferredSize(new Dimension(200, 50));
        clicksPerSec.setPreferredSize(new Dimension(200, 50));
        highestScore.setPreferredSize(new Dimension(300, 50));
-       saveScore.setPreferredSize(new Dimension(100, 100));
+       saveScore.setPreferredSize(new Dimension(150, 100));
        panel.setPreferredSize(new Dimension(800, 800));
     }
 
