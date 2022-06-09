@@ -1,1 +1,4 @@
-
+06-09-2022 16:19:17
+	- High Score: ≈12.9 Clicks/s
+	- Clicks: 13
+	 -Time: ≈1s
