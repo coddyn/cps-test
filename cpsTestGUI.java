@@ -1,6 +1,11 @@
 import java.awt.Dimension;
-
+import java.lang.Math;
 import javax.swing.*;
+import java.awt.event.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class cpsTestGUI{
 
@@ -12,26 +17,24 @@ public class cpsTestGUI{
     private JButton twoSecTest;
     private JButton fiveSecTest;
     private JButton tenSecTest;
+    private JButton saveScore;
 
     //labels
     private JLabel clicks;
     private JLabel clicksPerSec;
     private JLabel time;
-
+    private Timer stopwatch;
+    private JLabel highestScore;
     private JPanel panel;
     
     private int numClicks = 0;
-    private int highScore = 0;
+    private double cps;
+    private double highScore = 0;
     private int duration = 1;
-    private long end;
-    private long start;
-    private double elapsed = 0;
-    private boolean firstPress;
-
+    private double second;
 
     public cpsTestGUI(){
        this.frame = new JFrame("CPS test");
-       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
        frame.setSize(800,800);
        this.panel = new JPanel();
 
@@ -41,27 +44,14 @@ public class cpsTestGUI{
        this.twoSecTest = new JButton("2s test");
        this.fiveSecTest = new JButton("5s test");
        this.tenSecTest = new JButton("10s test");
+       this.saveScore = new JButton("Save score to file");
 
-       this.clicks = new JLabel("Clicks: " + 0);
+       this.clicks = new JLabel("Score: " + 0);
        this.time = new JLabel("Time: " + 0.0);
-       time.setPreferredSize(new Dimension(100, 50));
+       this.highestScore = new JLabel("Highest score this session: " + highScore + " Clicks/s");
+       this.clicksPerSec = new JLabel(0.0 + " Clicks/s");
 
-       initializeButtons();
-
-       panel.add(button);
-       panel.add(retry);
-       panel.add(clicks);
-       panel.add(time);
-       panel.add(oneSecTest);
-       panel.add(twoSecTest);
-       panel.add(fiveSecTest);
-       panel.add(tenSecTest);
-
-       panel.setPreferredSize(new Dimension(500, 500));
-
-       frame.getContentPane().add(panel);
-       //TODO: save highscore for current session 
-
+       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void update(){
@@ -69,7 +59,42 @@ public class cpsTestGUI{
         clicks.setText("Clicks: " + numClicks);
     }
 
-    public void initializeButtons(){
+    public void stopwatch(){
+        stopwatch = new Timer(10, new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                second+= 0.014;
+                time.setText("Timer: " + (double)Math.round(second * 100.0)/100.0); 
+                clicksPerSec.setText((double)Math.round((numClicks/second) * 100.0)/100.0 + " Clicks/s");
+                if(second >= duration){
+                    stopwatch.stop();
+                    button.setEnabled(false);
+                    cps = (double)Math.round((numClicks/second) * 100.0)/100.0;
+                    if(cps > highScore){
+                        highScore = cps;
+                    }
+                    highestScore.setText("Highest score this session: " + highScore + " Clicks/s");
+                }
+            }
+        });
+    }
+
+    public void addToFrame(){
+       panel.add(button);
+       panel.add(retry);
+       panel.add(oneSecTest);
+       panel.add(twoSecTest);
+       panel.add(fiveSecTest);
+       panel.add(tenSecTest);
+       panel.add(clicks);
+       panel.add(time);
+       panel.add(clicksPerSec);
+       panel.add(saveScore);
+       panel.add(highestScore);
+       frame.getContentPane().add(panel);
+    }
+
+    public void setSizes(){
        button.setPreferredSize(new Dimension(200, 200));
        retry.setPreferredSize(new Dimension(200, 200));
        clicks.setPreferredSize(new Dimension(200, 200));
@@ -77,21 +102,44 @@ public class cpsTestGUI{
        twoSecTest.setPreferredSize(new Dimension(200, 200));
        fiveSecTest.setPreferredSize(new Dimension(200, 200));
        tenSecTest.setPreferredSize(new Dimension(200, 200));
+       time.setPreferredSize(new Dimension(200, 50));
+       clicksPerSec.setPreferredSize(new Dimension(200, 50));
+       highestScore.setPreferredSize(new Dimension(300, 50));
+       saveScore.setPreferredSize(new Dimension(100, 100));
+       panel.setPreferredSize(new Dimension(800, 800));
+    }
 
+    public void saveFile(){
+        String high_score = String.valueOf(highScore) + " Clicks/s";
+        LocalDateTime time = LocalDateTime.now();
+        DateTimeFormatter myFormat = DateTimeFormatter.ofPattern("MM-dd-yyyy HH:mm:ss");
+        String date = time.format(myFormat);
+        String filename = "gameHistory.txt";
+        try{
+            FileWriter writer = new FileWriter(filename);
+            writer.write(date + "\n\t- High Score: ≈" + high_score);
+            writer.append("\n\t- Clicks: " + numClicks + "\n\t -Time: ≈" + duration +"s");
+            writer.append("\n");
+            writer.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+
+    public void initializeButtons(){
+       stopwatch();
         button.addActionListener(ActionEvent ->{
-            if(!firstPress){
-                start = System.currentTimeMillis();
-                end = System.currentTimeMillis() + (duration * 1000);
-                firstPress = true;
-                update();
-                time.setText("Timer: " + (System.currentTimeMillis()-start)/1000.0);
-            }
-            if(System.currentTimeMillis() >= end){
+            stopwatch.start();
+            if(second >= duration){
                 button.setEnabled(false);
-                time.setText("Timer: " + (System.currentTimeMillis()-start)/1000.0);
+                stopwatch.stop();
+                time.setText("Timer: " + second);
+                //time.setText("Timer: " + (System.currentTimeMillis()-start)/1000.0);
             }
                 update();
-                time.setText("Timer: " + (System.currentTimeMillis()-start)/1000.0);
+                //time.setText("Timer: " + (System.currentTimeMillis()-start)/1000.0);
             
         });
         
@@ -120,6 +168,10 @@ public class cpsTestGUI{
             reset();
             duration = 10;
         });
+
+        saveScore.addActionListener(ActionEvent ->{
+            saveFile();
+        });
     }
 
     public void showWindow(){
@@ -127,11 +179,13 @@ public class cpsTestGUI{
     }
 
     public void reset(){
+        stopwatch.stop();
         numClicks = 0;
-        elapsed = 0;
-        firstPress = false;
-        clicks.setText("Clicks: " + numClicks);
-        time.setText("Timer: " + elapsed);
+        second = 0;
+        cps = 0;
+        clicks.setText("Score: " + numClicks);
+        clicksPerSec.setText(0.0 + " Clicks/s");
+        time.setText("Timer: " + 0.0);
         button.setEnabled(true);
     }
 
